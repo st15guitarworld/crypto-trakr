@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
-price,AllExchanges,priceMultiFull} from './constants';
+price,AllExchanges,priceMultiFull,priceHistoryOneWeek,HisToHour} from './constants';
 import Highcharts from 'highcharts';
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
@@ -23,26 +23,26 @@ export const FETCH_COIN_PAIR_DETAIL_FULL = "FETCH_COIN_PAIR_DETAIL_FULL";
 export const FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS = "FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS";
 export const FETCH_COIN_PAIR_DETAIL_FULL_ERROR = "FETCH_COIN_PAIR_DETAIL_FULL_ERROR";
 
-export const FETCH_COIN_DETAIL_CHART = "FETCH_COIN_DETAIL_CHART";
-export const FETCH_COIN_DETAIL_CHART_ERROR = "FETCH_COIN_DETAIL_CHART_ERROR";
-export const FETCH_COIN_DETAIL_CHART_SUCCESS = "FETCH_COIN_DETAIL_CHART_SUCCESS";
+export const FETCH_COIN_PAIR_DETAIL_CHART = "FETCH_COIN_PAIR_DETAIL_CHART";
+export const FETCH_COIN_PAIR_DETAIL_CHART_ERROR = "FETCH_COIN_PAIR_DETAIL_CHART_ERROR";
+export const FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS = "FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS";
 
-export function fetchCoinDetailChart(){
+export function fetchPairCoinDetailChart(){
   return {
-    type:FETCH_COIN_DETAIL_CHART
+    type:FETCH_COIN_PAIR_DETAIL_CHART
   }
 }
 
-export function fetchCoinDetailChartError(error){
+export function fetchCoinPairDetailChartError(error){
   return {
-    type:FETCH_COIN_DETAIL_CHART,
+    type:FETCH_COIN_PAIR_DETAIL_CHART_ERROR,
     error:error
   }
 }
 
-export function fetchCoinDetailChartSuccess(data){
+export function fetchCoinPairDetailChartSuccess(data){
   return {
-    type:FETCH_COIN_DETAIL_CHART_SUCCESS,
+    type:FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS,
     data:data
   }
 }
@@ -216,7 +216,8 @@ export function fetchAndAddFavoriteCoinPairPrice(idObj) {
 }
  */
 export function fetchCoinPairDetail(obj) {
-  return function(dispatch){
+  return function(dispatch,getState){
+    const { coinPairDetail } = getState();
     return fetch(CoinCompareBaseUrl + priceMultiFull + "?" + buildURLParameters(obj))
            .then(response => response.json(),
             error => dispatch(fetchCoinPairDetailFullError(error))
@@ -227,6 +228,34 @@ export function fetchCoinPairDetail(obj) {
                 DISPLAY:json.DISPLAY[obj.fsyms][obj.tsyms]
               }
               dispatch(fetchCoinPairDetailFullSuccess(result))
+              let msg = {fsym:obj.fsyms,tsym:obj.tsyms,e:obj.e};
+              dispatch(fetchCoinPairHistoryChart(msg,coinPairDetail.coinPairPriceHistory.visibilityFilter))
             })
+  }
+}
+
+function fetchCoinPairHistoryOneWeek(idObj){
+  let argumentState = Object.assign({},idObj);
+  argumentState.aggregate=1;
+  argumentState.limit=168;
+  argumentState.tryConversion=false;
+
+  return function(dispatch) {
+    return fetch(CoinCompareBaseUrl + HisToHour + "?" + buildURLParameters(argumentState))
+          .then(response => response.json())
+          .then(json => {
+              dispatch(fetchCoinPairDetailChartSuccess(json.Data));
+          })
+  }
+}
+
+
+export function fetchCoinPairHistoryChart(idObj,visibilityFilter){
+  switch (visibilityFilter) {
+    case priceHistoryOneWeek:
+      return fetchCoinPairHistoryOneWeek(idObj);
+      break;
+    default:
+      return fetchCoinPairHistoryOneWeek(idObj);
   }
 }

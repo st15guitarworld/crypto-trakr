@@ -17,7 +17,7 @@ let  LoadingPaper = (Target) => {
   return class extends Component {
     constructor(props) {
       super(props);
-      this.state = {isLoading: false};
+      this.state = { isLoading: false};
     }
     notLoading = () => {
         this.setState({isLoading: false});

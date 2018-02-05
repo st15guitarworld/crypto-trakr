@@ -64,6 +64,7 @@ class CoinDetail extends Component {
     )
   }
 }
+
 let cnnectedCoinDetail = connect(
   mapStateToProps,
   mapDispatchToProps

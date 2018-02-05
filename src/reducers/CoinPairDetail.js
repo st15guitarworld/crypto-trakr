@@ -1,6 +1,7 @@
 import { combineReducers, createStore } from 'redux';
 import {FETCH_COIN_PAIR_DETAIL_FULL,FETCH_COIN_PAIR_DETAIL_FULL_ERROR,
 FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS} from '../actions'
+import coinPairPriceHistory from './CoinPairPriceHistory';
 
 let coinPairDetailDefault = {
   RAW:{},
@@ -27,7 +28,9 @@ function isFetching(state=false,action) {
       return state;
   }
 }
+
 export default combineReducers({
   coinPairDetail,
-  isFetching
+  isFetching,
+  coinPairPriceHistory
 })
