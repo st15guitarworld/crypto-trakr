@@ -186,7 +186,6 @@ export function fetchAllExchanges(){
  */
 export function fetchAndAddFavoriteCoinPairPrice(idObj) {
   return function(dispatch){
-    console.log(idObj);
     return fetch(CoinCompareBaseUrl + price + "?"+buildURLParameters(idObj))
     .then(
       response => response.json(),
@@ -218,6 +217,7 @@ export function fetchAndAddFavoriteCoinPairPrice(idObj) {
 export function fetchCoinPairDetail(obj) {
   return function(dispatch,getState){
     const { coinPairDetail } = getState();
+    dispatch(fetchCoinPairDetailFull());
     return fetch(CoinCompareBaseUrl + priceMultiFull + "?" + buildURLParameters(obj))
            .then(response => response.json(),
             error => dispatch(fetchCoinPairDetailFullError(error))

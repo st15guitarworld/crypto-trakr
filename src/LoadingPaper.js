@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import CircularProgress from 'material-ui/CircularProgress';
+import PropTypes from 'prop-types';
+
 import {Card} from 'material-ui/Card';
 let style = {
   position:'relative',
@@ -13,20 +15,9 @@ const iconStyle = {
             transform: 'translate(-50%, -50%)',
         };
 
-let  LoadingPaper = (Target) => {
-  return class extends Component {
-    constructor(props) {
-      super(props);
-      this.state = { isLoading: false};
-    }
-    notLoading = () => {
-        this.setState({isLoading: false});
-    };
-    isLoading = () => {
-        this.setState({isLoading: true});
-    };
-    render(){
-      if(this.state.isLoading){
+let  LoadingPaper = (props) => {
+      const {isLoading, Target} = props;
+      if(isLoading){
           return (
             <Card  style={style}>
                 <CircularProgress style={iconStyle}/>
@@ -34,12 +25,13 @@ let  LoadingPaper = (Target) => {
           );
       }
       return (
-        <Target {...this.props}
-                         isLoading={this.state.isLoading}
-                         notLoading={this.notLoading}
-                         loading={this.isLoading}/>
-      );
-    }
-  }
+        <Target {...props}/>
+      )
+    };
+
+LoadingPaper.propTypes = {
+  isLoading: PropTypes.bool,
+  Target: PropTypes.element
 };
+
 export default LoadingPaper;

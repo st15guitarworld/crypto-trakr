@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import FavoriteCoinPairs from './FavoriteCoinPairs';
+import FavoriteCoinPairContainer from './FavoriteCoinPairContainer';
 import PopCoinsContainer from './PopCoinsContainer';
-import CoinDetail from './CoinDetail'
+import CoinDetailContainer from './CoinDetailContainer'
 import {
   BrowserRouter as Router,
   Route,
@@ -14,8 +14,8 @@ class App extends Component {
     return (
       <Router>
         <div>
-        <Route exact path="/" component={FavoriteCoinPairs}/>
-        <Route path="/coinDetail" component={CoinDetail}/>
+        <Route exact path="/" component={FavoriteCoinPairContainer}/>
+        <Route path="/coinDetail" component={CoinDetailContainer}/>
         </div>
       </Router>
     );
