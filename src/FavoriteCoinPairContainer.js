@@ -40,7 +40,7 @@ let favoriteCoinPairInner = (props) => {
          </div>
         ))}
       </List>
-      <FloatingActionButton style={addButtonStyle} onClick={() => props.openDialog()}>
+      <FloatingActionButton style={addButtonStyle} onClick={() => props.history.push("addFavoriteCurrencyPair")}>
        <ContentAdd />
      </FloatingActionButton>
     </div>

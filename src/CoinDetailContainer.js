@@ -24,10 +24,10 @@ let CoinPairDetailInner = (props) => {
   return (
     <div>
     <div className="coin-detail-item">
-      <p>Current Price ({props.tsyms})</p>
+      <p>Current Price</p>
       <h2>{props.coinPairDetailDISPLAY.PRICE}</h2>
     </div>
-    <div class="coin-detail-item-container">
+    <div className="coin-detail-item-container">
         <div className="coin-detail-item-container-item">
           <p>24 Hr Change</p>
           <small>{props.coinPairDetailDISPLAY.CHANGEPCT24HOUR} %</small>
@@ -40,6 +40,9 @@ let CoinPairDetailInner = (props) => {
           <p> Market Cap</p>
           <small>{props.coinPairDetailDISPLAY.MKTCAP}</small>
         </div>
+    </div>
+    <div >
+
     </div>
     </div>
   );
