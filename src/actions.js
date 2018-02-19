@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
-price,AllExchanges,priceMultiFull,priceHistoryOneWeek,HisToHour} from './constants';
-import Highcharts from 'highcharts';
+price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute} from './constants';
+
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
 export const FETCH_ALL_COINS_ERROR='FETCH_ALL_COINS_ERROR';
@@ -14,6 +14,7 @@ export const RESET_CURRENT_NEW_COIN_PAIRS="RESET_CURRENT_NEW_COIN_PAIRS";
 
 export const ADD_FAVORITE_COIN_PAIR ="ADD_FAVORITE_COIN_PAIR";
 export const ADD_FAVORITE_COIN_PAIR_ERROR = "ADD_FAVORITE_COIN_PAIR_ERROR";
+export const ADD_FAVORITE_COIN_PAIR_SUCCESS = "ADD_FAVORITE_COIN_PAIR_SUCCESS";
 
 export const FETCH_ALL_EXCHANGES = 'FETCH_ALL_EXCHANGES';
 export const FETCH_ALL_EXCHANGES_ERROR='FETCH_ALL_EXCHANGES_ERROR';
@@ -26,6 +27,21 @@ export const FETCH_COIN_PAIR_DETAIL_FULL_ERROR = "FETCH_COIN_PAIR_DETAIL_FULL_ER
 export const FETCH_COIN_PAIR_DETAIL_CHART = "FETCH_COIN_PAIR_DETAIL_CHART";
 export const FETCH_COIN_PAIR_DETAIL_CHART_ERROR = "FETCH_COIN_PAIR_DETAIL_CHART_ERROR";
 export const FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS = "FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS";
+
+export const SET_PRICE_CHART_VISIBILITY_FILTER_1W = "SET_PRICE_CHART_VISIBILITY_FILTER_1W";
+export const SET_PRICE_CHART_VISIBILITY_FILTER_1H = "SET_PRICE_CHART_VISIBILITY_FILTER_1H";
+
+export function setPriceChartVisibilityFilter1W(){
+  return {
+    type:SET_PRICE_CHART_VISIBILITY_FILTER_1W
+  }
+}
+
+export function setPriceChartVisibilityFilter1H(){
+  return {
+    type:SET_PRICE_CHART_VISIBILITY_FILTER_1H
+  }
+}
 
 export function fetchPairCoinDetailChart(){
   return {
@@ -40,10 +56,11 @@ export function fetchCoinPairDetailChartError(error){
   }
 }
 
-export function fetchCoinPairDetailChartSuccess(data){
+export function fetchCoinPairDetailChartSuccess(result){
   return {
     type:FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS,
-    data:data
+    data:result.data,
+    lineData:result.lineData
   }
 }
 
@@ -67,9 +84,22 @@ export function fetchCoinPairDetailFullError(error){
   }
 }
 
-export function addFavoriteCoinPair(coinPair){
+export function addFavoriteCoinPair(){
   return {
-    type: ADD_FAVORITE_COIN_PAIR,
+    type: ADD_FAVORITE_COIN_PAIR
+  }
+}
+
+export function addFavoriteCoinPairError(error){
+  return {
+    type: ADD_FAVORITE_COIN_PAIR_ERROR,
+    error:error
+  }
+}
+
+export function addFavoriteCoinPairSuccess(coinPair){
+  return {
+    type: ADD_FAVORITE_COIN_PAIR_SUCCESS,
     coinPair
   }
 }
@@ -186,6 +216,7 @@ export function fetchAllExchanges(){
  */
 export function fetchAndAddFavoriteCoinPairPrice(idObj) {
   return function(dispatch){
+    dispatch(addFavoriteCoinPair());
     return fetch(CoinCompareBaseUrl + price + "?"+buildURLParameters(idObj))
     .then(
       response => response.json(),
@@ -202,8 +233,7 @@ export function fetchAndAddFavoriteCoinPairPrice(idObj) {
         fsym:idObj.fsym,
         tsyms:idObj.tsyms,
       };
-      console.log(result);
-      dispatch(addFavoriteCoinPair(result));
+      dispatch(addFavoriteCoinPairSuccess(result));
     })
   }
 }
@@ -218,6 +248,7 @@ export function fetchCoinPairDetail(obj) {
   return function(dispatch,getState){
     const { coinPairDetail } = getState();
     dispatch(fetchCoinPairDetailFull());
+    dispatch(fetchPairCoinDetailChart())
     return fetch(CoinCompareBaseUrl + priceMultiFull + "?" + buildURLParameters(obj))
            .then(response => response.json(),
             error => dispatch(fetchCoinPairDetailFullError(error))
@@ -234,6 +265,27 @@ export function fetchCoinPairDetail(obj) {
   }
 }
 
+function fetchCoinPairHistoryOneHour(idObj){
+  let argumentState = Object.assign({},idObj);
+  argumentState.aggregate=1;
+  argumentState.limit=60;
+  argumentState.tryConversion=false;
+
+  return function(dispatch) {
+    return fetch(CoinCompareBaseUrl + HistoMinute + "?" +buildURLParameters(argumentState))
+            .then(response => response.json())
+            .then(json => {
+              let lineData = json.Data.map((d => [d.time * 1000,d.close]));
+              let rsult = {
+                data:json.Data,
+                lineData:lineData
+              };
+                dispatch(setPriceChartVisibilityFilter1H());
+                dispatch(fetchCoinPairDetailChartSuccess(rsult));
+            });
+  }
+}
+
 function fetchCoinPairHistoryOneWeek(idObj){
   let argumentState = Object.assign({},idObj);
   argumentState.aggregate=1;
@@ -244,17 +296,26 @@ function fetchCoinPairHistoryOneWeek(idObj){
     return fetch(CoinCompareBaseUrl + HisToHour + "?" + buildURLParameters(argumentState))
           .then(response => response.json())
           .then(json => {
-              dispatch(fetchCoinPairDetailChartSuccess(json.Data));
+            let lineData = json.Data.map((d => [d.time * 1000,d.close]));
+            let rsult = {
+              data:json.Data,
+              lineData:lineData
+            };
+              dispatch(setPriceChartVisibilityFilter1W());
+              dispatch(fetchCoinPairDetailChartSuccess(rsult));
           })
   }
 }
 
-
-export function fetchCoinPairHistoryChart(idObj,visibilityFilter){
+/*
+idObj {fsym:obj.fsyms,tsym:obj.tsyms,e:obj.e};
+*/
+export function fetchCoinPairHistoryChart(idObj, visibilityFilter){
   switch (visibilityFilter) {
     case priceHistoryOneWeek:
       return fetchCoinPairHistoryOneWeek(idObj);
-      break;
+    case priceHistoryOneHour:
+      return fetchCoinPairHistoryOneHour(idObj);
     default:
       return fetchCoinPairHistoryOneWeek(idObj);
   }

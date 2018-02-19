@@ -3,6 +3,7 @@ export const CryptoSortOrderAttribute = "SortOrder";
 export const CoinList = "/data/all/coinlist";
 export const HisToDay = "/data/histoday";
 export const HisToHour = "/data/histohour";
+export const HistoMinute = "/data/histominute";
 export const CoinCompareSubs = "/data/subs"
 export const AllExchanges = "/data/all/exchanges";
 export const priceMultiFull = "/data/pricemultifull";

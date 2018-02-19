@@ -5,7 +5,6 @@ import StarBorder from 'material-ui/svg-icons/toggle/star-border';
 import { connect } from 'react-redux';
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,HisToHour} from './constants';
-import Highcharts from 'highcharts';
 import moment from 'moment';
 import LoadingPaper from './LoadingPaper';
 import {Card,CardHeader,CardMedia} from 'material-ui/Card';
@@ -41,49 +40,6 @@ class PopCoinCard extends Component{
     this.setState({loading:false,lastUpdated:Date.now()});
     let seriesData = json.map((data)=> [data.time,data.close])
     var minimumValue = json.reduce((a,b)=> a.close<b.close ? a.close : b.close);
-    if(!this.state.loading)
-    var myChart = Highcharts.chart(this.props.coin.Name+"-chart", {
-        chart: {
-            type: 'area',
-            margin: [0, 0, 0, 0]
-        },
-        title: {
-            text: ''
-        },
-        xAxis: {
-          visible:false
-        },
-        tooltip: {
-        crosshairs: [true],
-        formatter: function() {
-          var date = moment.unix(this.x).format("MMM D HH:mm");
-          var price = currencyFormat(this.y);
-          return date +"<br/>" +"<b>"+price+"</b>"
-    }
-      },
-        plotOptions: {
-        area: {
-            marker: {
-                enabled: false,
-                symbol: 'circle',
-                radius: 2,
-                states: {
-                    hover: {
-                        enabled: true
-                    }
-                }
-            }
-        }
-    },
-        yAxis: {
-          min:minimumValue - 50,
-          visible:false
-        },
-        series: [{
-            showInLegend: false,
-            data:seriesData
-        }]
-    });
   }
   constructOptions() {
     var u = new URLSearchParams();

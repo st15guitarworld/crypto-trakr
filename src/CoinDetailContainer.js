@@ -2,50 +2,31 @@ import React,{ Component } from 'react';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import {fetchCoinPairDetail} from './actions';
+import {fetchCoinPairDetail, fetchCoinPairHistoryChart} from './actions';
 import {connect} from 'react-redux';
 import LoadingPaper from './LoadingPaper';
+import Highcharts from 'highcharts/highstock';
+import {
+  HighchartsStockChart, Chart, withHighcharts, XAxis, YAxis, Title, Legend,
+  AreaSplineSeries, SplineSeries, Navigator, RangeSelector, Tooltip
+} from 'react-jsx-highstock';
+import CoinDetail from './CoinDetail';
 
 const mapStateToProps = (state,props) => {
   return {
     coinPairDetailRAW: state.coinPairDetail.coinPairDetail.RAW,
     coinPairDetailDISPLAY:state.coinPairDetail.coinPairDetail.DISPLAY,
-    isLoading: state.coinPairDetail.isFetching
+    coinPairHistory:state.coinPairDetail.coinPairPriceHistory,
+    coinPairDetail:state.coinPairDetail,
+    isLoading: state.coinPairDetail.isFetching && state.coinPairDetail.coinPairPriceHistory.isFetching
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchCoinPairDetail:(e)=> dispatch(fetchCoinPairDetail(e))
+    fetchCoinPairDetail:(e) => dispatch(fetchCoinPairDetail(e)),
+    fetchCoinPairHistoryChart:(e,a) => dispatch(fetchCoinPairHistoryChart(e,a))
   };
-}
-
-let CoinPairDetailInner = (props) => {
-  return (
-    <div>
-    <div className="coin-detail-item">
-      <p>Current Price</p>
-      <h2>{props.coinPairDetailDISPLAY.PRICE}</h2>
-    </div>
-    <div className="coin-detail-item-container">
-        <div className="coin-detail-item-container-item">
-          <p>24 Hr Change</p>
-          <small>{props.coinPairDetailDISPLAY.CHANGEPCT24HOUR} %</small>
-        </div>
-        <div className="coin-detail-item-container-item">
-          <p>24 Hr Volume</p>
-          <small>{props.coinPairDetailDISPLAY.TOTALVOLUME24HTO}</small>
-        </div>
-        <div className="coin-detail-item-container-item">
-          <p> Market Cap</p>
-          <small>{props.coinPairDetailDISPLAY.MKTCAP}</small>
-        </div>
-    </div>
-    <div >
-
-    </div>
-    </div>
-  );
 }
 
 class CoinDetailContainer extends Component {
@@ -67,12 +48,12 @@ class CoinDetailContainer extends Component {
       }
   }
   render(){
-    let cooinPairDetailProps = {
-      Target: CoinPairDetailInner,
+    let coinPairDetailProps = {
+      Target: CoinDetail,
       tsyms: this.state.tsyms,
       ...this.props
     }
-    let LoadingCoinPairDetail = LoadingPaper(cooinPairDetailProps);
+    let LoadingCoinPairDetail = LoadingPaper(coinPairDetailProps);
     return (
     <div className="coin-detail-container">
       <AppBar title={this.state.fsyms +" - "+this.state.tsyms} className="coin-detail-appbar" iconElementLeft={<IconButton onClick={this.goBack}><NavigationArrowBack /></IconButton>}>
