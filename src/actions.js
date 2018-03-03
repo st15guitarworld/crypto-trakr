@@ -210,7 +210,7 @@ export function fetchAllExchanges(){
 /**
  * idObj = {
  fromSym,
- tSym,
+ toSym,
  e
 }
  */
@@ -237,6 +237,21 @@ export function fetchAndAddFavoriteCoinPairPrice(idObj) {
     })
   }
 }
+
+export function refreshFavoriteCoinPairs(){
+  return function(dispatch,getState) {
+    const { favoriteCoinPairs } = getState();
+    let urls = favoriteCoinPairs.coins.map(pair => ({fsym:pair.fsym,tsyms:pair.tsyms,e:pair.e}))
+                                        .map(idObj => CoinCompareBaseUrl + price + "?"+buildURLParameters(idObj));
+    return Promise.all(urls.map(fetch)).then(responses =>
+      Promise.all(responses.map(res => res.json()))
+        .then(jsons => {}));
+
+  }
+}
+
+
+
 /**
  * idObj = {
  fromSym,

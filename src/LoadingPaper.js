@@ -15,8 +15,9 @@ const iconStyle = {
             transform: 'translate(-50%, -50%)',
         };
 
-let  LoadingPaper = (props) => {
-      const {isLoading, Target} = props;
+class LoadingPaper extends Component{
+      render(){
+      const {isLoading, Target} = this.props;
       if(isLoading){
           return (
             <Card  style={style}>
@@ -25,13 +26,14 @@ let  LoadingPaper = (props) => {
           );
       }
       return (
-        <Target {...props}/>
+        <Target {...this.props}/>
       )
-    };
+    }
+  };
 
 LoadingPaper.propTypes = {
   isLoading: PropTypes.bool,
-  Target: PropTypes.element
+  Target: PropTypes.func
 };
 
 export default LoadingPaper;

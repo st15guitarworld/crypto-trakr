@@ -53,12 +53,12 @@ class CoinDetailContainer extends Component {
       tsyms: this.state.tsyms,
       ...this.props
     }
-    let LoadingCoinPairDetail = LoadingPaper(coinPairDetailProps);
+  
     return (
     <div className="coin-detail-container">
       <AppBar title={this.state.fsyms +" - "+this.state.tsyms} className="coin-detail-appbar" iconElementLeft={<IconButton onClick={this.goBack}><NavigationArrowBack /></IconButton>}>
       </AppBar>
-        {LoadingCoinPairDetail}
+      <LoadingPaper {...coinPairDetailProps}/>
     </div>
     )
   }

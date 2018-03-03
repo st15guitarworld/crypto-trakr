@@ -7,6 +7,8 @@ import {ListItem,List} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import PullToRefresh from './PullToRefresh';
+import {refreshFavoriteCoinPairs} from './actions';
 
 const addButtonStyle = {
   position:"fixed",
@@ -24,28 +26,28 @@ const mapStateToProps = (state,props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    refreshFavsCoinPairs:() => dispatch(refreshFavoriteCoinPairs())
   };
 }
 
-let favoriteCoinPairInner = (props) => {
+class FavoriteCoinPairInner extends Component {
+  render(){
   return (
-    <div>
+    <div id="FavoriteCoinPairInner" style={this.props.style}>
       <List>
-        {props.favoriteCoinPairs.map((pair,index)=>(
+        {this.props.favoriteCoinPairs.map((pair,index)=>(
           <div key={index}>
           <ListItem key={index} primaryText={pair.price} secondaryText={pair.fsym+" - "+ pair.tsyms + " "+ pair.e}
-            onClick={() => {props.history.push("coinDetail", {fsym:pair.fsym,e:pair.e,tsyms:pair.tsyms})}}
+            onClick={() => {this.props.history.push("coinDetail", {fsym:pair.fsym,e:pair.e,tsyms:pair.tsyms})}}
           />
            <Divider />
          </div>
         ))}
       </List>
-      <FloatingActionButton style={addButtonStyle} onClick={() => props.history.push("addFavoriteCurrencyPair")}>
-       <ContentAdd />
-     </FloatingActionButton>
     </div>
   );
-};
+}
+}
 
 class FavoriteCoinPairContainer extends Component {
   constructor(props){
@@ -63,21 +65,23 @@ class FavoriteCoinPairContainer extends Component {
     this.setState({dialogOpen:true})
   }
   render(){
-    let favoreiteCoinPairProps = {
-      Target:favoriteCoinPairInner,
+    let favoriteCoinPairProps = {
+      Target:FavoriteCoinPairInner,
       openDialog: this.openDialog,
       closeDialog:this.closeDialog,
       ...this.props
     }
-    let LoadingFavoriteCoinPairInner = LoadingPaper(favoreiteCoinPairProps);
+
     return  (
       <div>
     <AppBar title="Crypto-Trakr" className="favorite-coin-appbar" iconStyleRight={{
       margin:0
     }}>
-     <AddCurrencyPairDialog closeDialog={this.closeDialog} dialogOpen={this.state.dialogOpen}/>
     </AppBar>
-    {LoadingFavoriteCoinPairInner}
+    <PullToRefresh ContentEl={LoadingPaper} neededProps={favoriteCoinPairProps} LoadingFunc={this.props.refreshFavsCoinPairs}/>
+    <FloatingActionButton style={addButtonStyle} onClick={() => this.props.history.push("addFavoriteCurrencyPair")}>
+     <ContentAdd />
+   </FloatingActionButton>
     </div>
     );
   }
