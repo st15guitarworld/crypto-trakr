@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import Hammer from 'hammerjs';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
+import _ from 'underscore';
 
 export default class PullToRefresh extends Component {
     constructor(props){
@@ -24,11 +25,15 @@ export default class PullToRefresh extends Component {
     }
     _panStart(e) {
       console.log("pan start");
-      this.setState({pan:{startingPositionY: document.body.scrollTop}},()=>{
-        if ( this.state.pan.startingPositionY === 0 ) {
-          this.setState({isLoading:false,pan:{enabled: true}});
-        }
-      });
+      let newState = _.extend({},this.state);
+      newState.pan.startingPositionY = document.body.scrollTop;
+      this.setState(newState,()=>{
+        if (this.state.pan.startingPositionY === 0 ) {
+          let newState2 = _.extend({},this.state);
+          newState2.isLoading = false;
+          newState2.pan.enabled=true;
+          this.setState(newState2);
+      }});
     }
     _panUp(e){
       console.log("pan up");
@@ -37,11 +42,13 @@ export default class PullToRefresh extends Component {
   		}
 
   		e.preventDefault();
-
+        let newState = _.extend({},this.state);
   		if ( this.state.pan.distance < e.distance / this.state.resistance ) {
-  			this.setState({pan:{distance: 0,enabled:false}});
+        newState.pan.distance=0;
+  			this.setState(newState);
   		} else {
-  			this.setState({pan:{distance: e.distance / this.state.resistance,enabled:true}});
+        newState.pan.distance=e.distance / this.state.resistance;
+  			this.setState(newState);
   		}
 
     }
@@ -52,15 +59,22 @@ export default class PullToRefresh extends Component {
 		}
 
 		e.preventDefault();
-
+    let newState = _.extend({},this.state);
     if(e.distance >= this.state.distanceToRefresh){
-      this.setState({isLoading:true});
+      newState.isLoading=true;
+      this.setState(newState);
     }else{
-      this.setState({pan:{distance:0,enabled:false}});
+      newState.pan.distance=0;
+      newState.pan.enabled=false;
+      this.setState(newState);
     }
     var that = this;
+    let newState2 = _.extend({},this.state);
+    newState2.isLoading = false;
+    newState2.pan.distance=0;
+    newState2.pan.enabled = false;
     let loadingPromise = this.props.LoadingFunc();
-    loadingPromise.then(()=> that.setState({isLoading:false,pan:{distance:0,enabled:false}}));
+    loadingPromise.then(()=> that.setState(newState2));
     }
 
     _panDown(e){
@@ -69,7 +83,10 @@ export default class PullToRefresh extends Component {
   			return;
   		  }
         e.preventDefault();
-        this.setState({pan:{distance: e.distance / this.state.resistance,enabled:true}});
+        let newState = _.extend({},this.state);
+        newState.pan.distance = e.distance / this.state.resistance;
+        newState.pan.enabled = true;
+        this.setState(newState);
     }
     componentDidMount(){
       if(!this.h){
@@ -83,8 +100,8 @@ export default class PullToRefresh extends Component {
       }
     }
     componentWillUpdate(nextProps,nextState){
-      if(nextState.pan.enabled ||  this.state.pan.distance > 0){
-       return;
+      if(this.contentElement.style["touchAction"]){
+        return;
       }
       this.h = new Hammer(this.contentElement);
       this.h.get( 'pan' ).set( { direction: Hammer.DIRECTION_VERTICAL } );
@@ -104,7 +121,7 @@ export default class PullToRefresh extends Component {
         <div className="refresh-pullable-container">
           <div
             style={{
-              transform:"translate3d( 0,"+(distance - ptrElOffsetHeight)+ "px,0)",
+              WebkitTransform:"translate3d( 0,"+(distance - ptrElOffsetHeight)+ "px,0)",
               transition:!this.state.pan.enabled && this.state.pan.distance == 0 ? "all .25s ease" : "none",
               position: "absolute",
               top: "13px",
@@ -129,7 +146,7 @@ export default class PullToRefresh extends Component {
             {...this.props.neededProps}
             ref={(content) => { this.contentElement = ReactDOM.findDOMNode(content); }}
             style={{
-              transform: this.state.isLoading ? "translate3d( 0, 50px, 0 )" : "translate3d( 0,"+ distance + "px,0)",
+              WebkitTransform: this.state.isLoading ? "translate3d( 0, 50px, 0 )" : "translate3d( 0,"+ distance + "px,0)",
               transition:!this.state.enabled && this.state.pan.distance == 0 ? "all .25s ease" : "none"
             }}
           />
