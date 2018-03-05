@@ -60,7 +60,7 @@ export default class PullToRefresh extends Component {
 
 		e.preventDefault();
     let newState = _.extend({},this.state);
-    if(e.distance >= this.state.distanceToRefresh){
+    if(this.state.pan.distance >= this.state.distanceToRefresh){
       newState.isLoading=true;
       this.setState(newState);
     }else{
@@ -85,7 +85,6 @@ export default class PullToRefresh extends Component {
         e.preventDefault();
         let newState = _.extend({},this.state);
         newState.pan.distance = e.distance / this.state.resistance;
-        newState.pan.enabled = true;
         this.setState(newState);
     }
     componentDidMount(){
