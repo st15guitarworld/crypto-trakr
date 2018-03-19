@@ -2,7 +2,7 @@ import React,{ Component } from 'react';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import {fetchCoinPairDetail, fetchCoinPairHistoryChart} from './actions';
+import {fetchOrRefreshFavoriteCoinPair, fetchCoinPairHistoryChart} from './actions';
 import {connect} from 'react-redux';
 import LoadingPaper from './LoadingPaper';
 import Highcharts from 'highcharts/highstock';
@@ -11,21 +11,24 @@ import {
   AreaSplineSeries, SplineSeries, Navigator, RangeSelector, Tooltip
 } from 'react-jsx-highstock';
 import CoinDetail from './CoinDetail';
-
+import _ from "underscore";
 const mapStateToProps = (state,props) => {
+  let selectedFavoriteCoinPairDetail = _.find(state.favoriteCoinPairDetails.coinPairDetail,(d)=> d.id == state.selectedFavoriteCoinPair);
+  let selectedFavoriteCoinPairHistory = _.find(state.favoriteCoinPairPriceHistory.coinPairPriceHistory.histories,(h) => h.coinPairId == selectedFavoriteCoinPairDetail.id)
   return {
-    coinPairDetailRAW: state.coinPairDetail.coinPairDetail.RAW,
-    coinPairDetailDISPLAY:state.coinPairDetail.coinPairDetail.DISPLAY,
-    coinPairHistory:state.coinPairDetail.coinPairPriceHistory,
-    coinPairDetail:state.coinPairDetail,
-    isLoading: state.coinPairDetail.isFetching && state.coinPairDetail.coinPairPriceHistory.isFetching
+    coinPairDetailRAW: selectedFavoriteCoinPairDetail.RAW,
+    coinPairDetailDISPLAY:selectedFavoriteCoinPairDetail.DISPLAY,
+    coinPairHistory:selectedFavoriteCoinPairHistory,
+    coinPairDetail:selectedFavoriteCoinPairDetail,
+    visibilityFilter: state.favoriteCoinPairPriceHistory.visibilityFilter,
+    isLoading: selectedFavoriteCoinPairDetail.isFetching && selectedFavoriteCoinPairHistory.isFetching
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    fetchCoinPairDetail:(e) => dispatch(fetchCoinPairDetail(e)),
-    fetchCoinPairHistoryChart:(e,a) => dispatch(fetchCoinPairHistoryChart(e,a))
+    refreshCoinPairDetail:(e,id) => dispatch(fetchOrRefreshFavoriteCoinPair(e,id)),
+    fetchCoinPairHistoryChart:(e,a,id) => dispatch(fetchCoinPairHistoryChart(e,a,id))
   };
 }
 
@@ -40,7 +43,7 @@ class CoinDetailContainer extends Component {
     this.goBack = this.goBack.bind(this);
   }
   componentWillMount() {
-    this.props.fetchCoinPairDetail(this.state);
+    //this.props.refreshCoinPairDetail(this.state,this.props.coinPairDetail.id);
   }
   goBack(){
       if(this.props.history) {
@@ -53,7 +56,7 @@ class CoinDetailContainer extends Component {
       tsyms: this.state.tsyms,
       ...this.props
     }
-  
+
     return (
     <div className="coin-detail-container">
       <AppBar title={this.state.fsyms +" - "+this.state.tsyms} className="coin-detail-appbar" iconElementLeft={<IconButton onClick={this.goBack}><NavigationArrowBack /></IconButton>}>

@@ -3,25 +3,27 @@ import {FETCH_COIN_PAIR_DETAIL_CHART,FETCH_COIN_PAIR_DETAIL_CHART_ERROR,
 FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS,SET_PRICE_CHART_VISIBILITY_FILTER_1W,
 SET_PRICE_CHART_VISIBILITY_FILTER_1H} from '../actions';
 import {priceHistoryOneWeek,priceHistoryOneMonth,priceHistoryOneHour} from '../constants';
-
+import _ from "underscore";
 
 let baseCoinPairPriceHistory = {
-  data:[],
-  lineData:[],
+  histories:[],
   error:null
 };
 
 function coinPairPriceHistory(state=baseCoinPairPriceHistory,action) {
-  let newState = Object.assign({});
+  let newState = JSON.parse(JSON.stringify(state));
   switch (action.type) {
     case FETCH_COIN_PAIR_DETAIL_CHART_ERROR:
       newState.error = action.error;
       return newState;
     case FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS:
-      newState.data = action.data;
-      newState.lineData = action.lineData;
+    let previosuPriceHistoryIndex = _.findIndex(newState.histories, e => e.coinPairId == action.result.coinPairId );
+      if(previosuPriceHistoryIndex >= 0){
+        newState.histories[previosuPriceHistoryIndex] = action.result;
+      }else{
+        newState.histories.push(action.result);
+      }
       return newState;
-      break;
     default:
       return state;
   }

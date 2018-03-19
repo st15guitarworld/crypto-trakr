@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
 price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute} from './constants';
-
+import uuidv1 from 'uuid/v1';
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
 export const FETCH_ALL_COINS_ERROR='FETCH_ALL_COINS_ERROR';
@@ -31,6 +31,26 @@ export const FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS = "FETCH_COIN_PAIR_DETAIL_CHAR
 export const SET_PRICE_CHART_VISIBILITY_FILTER_1W = "SET_PRICE_CHART_VISIBILITY_FILTER_1W";
 export const SET_PRICE_CHART_VISIBILITY_FILTER_1H = "SET_PRICE_CHART_VISIBILITY_FILTER_1H";
 
+export const SET_SELECTED_FAVORITE_COIN_PAIR = "SET_SELECTED_FAVORITE_COIN_PAIR";
+export const RESET_SELECTED_FAVORITE_COIN_PAIR = "RESET_SELECTED_FAVORITE_COIN_PAIR";
+
+export function resetSelectedFavoriteCoinPair() {
+  return {
+    type:RESET_SELECTED_FAVORITE_COIN_PAIR
+  }
+}
+export function setSelectedFavoriteCoinPair(id) {
+  return dispatch => {
+    return new Promise((resolve,reject) => {
+      dispatch({
+      type:SET_SELECTED_FAVORITE_COIN_PAIR,
+      selected:id
+    });
+    resolve();
+  })
+}
+}
+
 export function setPriceChartVisibilityFilter1W(){
   return {
     type:SET_PRICE_CHART_VISIBILITY_FILTER_1W
@@ -59,8 +79,7 @@ export function fetchCoinPairDetailChartError(error){
 export function fetchCoinPairDetailChartSuccess(result){
   return {
     type:FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS,
-    data:result.data,
-    lineData:result.lineData
+    result
   }
 }
 
@@ -79,7 +98,7 @@ export function fetchCoinPairDetailFullSuccess(coinPairDetail){
 
 export function fetchCoinPairDetailFullError(error){
   return {
-    type:FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS,
+    type:FETCH_COIN_PAIR_DETAIL_FULL_ERROR,
     error:error
   }
 }
@@ -214,39 +233,27 @@ export function fetchAllExchanges(){
  e
 }
  */
-export function fetchAndAddFavoriteCoinPairPrice(idObj) {
+export function fetchOrRefreshFavoriteCoinPair(idObj,id) {
   return function(dispatch){
+    let uuid = Object.is(id, undefined) ? uuidv1() : id;
     dispatch(addFavoriteCoinPair());
-    return fetch(CoinCompareBaseUrl + price + "?"+buildURLParameters(idObj))
-    .then(
-      response => response.json(),
-      // Do not use catch, because that will also catch
-      // any errors in the dispatch and resulting render,
-      // causing a loop of 'Unexpected batch number' errors.
-      // https://github.com/facebook/react/issues/6895
-      error => dispatch(fetchCurrentNewCoinPairActionError(error))
-    )
-    .then(json => {
-      let result = {
-        price:json[idObj.tsyms],
-        e:idObj.e,
-        fsym:idObj.fsym,
-        tsyms:idObj.tsyms,
-      };
-      dispatch(addFavoriteCoinPairSuccess(result));
-    })
-  }
+    let result = {
+      id:uuid,
+      ...idObj
+    }
+
+    let msg = {fsym:idObj.fsyms,tsym:idObj.tsyms,e:idObj.e};
+    return Promise.all([dispatch(fetchCoinPairDetail(idObj,uuid)),dispatch(fetchCoinPairHistoryChart(msg,priceHistoryOneWeek,uuid))])
+    }
 }
 
-export function refreshFavoriteCoinPairs(){
+export function refreshAllFavoriteCoinPairs(){
   return function(dispatch,getState) {
-    const { favoriteCoinPairs } = getState();
-    let urls = favoriteCoinPairs.coins.map(pair => ({fsym:pair.fsym,tsyms:pair.tsyms,e:pair.e}))
-                                        .map(idObj => CoinCompareBaseUrl + price + "?"+buildURLParameters(idObj));
-    return Promise.all(urls.map(fetch)).then(responses =>
-      Promise.all(responses.map(res => res.json()))
-        .then(jsons => {}));
-
+    const { favoriteCoinPairDetails } = getState();
+    let refreshPromises = favoriteCoinPairDetails.coinPairDetail.map(pair =>{
+      dispatch(fetchOrRefreshFavoriteCoinPair({fsyms:pair.RAW.FROMSYMBOL,tsyms:pair.RAW.TOSYMBOL,e:pair.RAW.MARKET},pair.id))
+    })
+    return Promise.all(refreshPromises);
   }
 }
 
@@ -259,39 +266,40 @@ export function refreshFavoriteCoinPairs(){
  e
 }
  */
-export function fetchCoinPairDetail(obj) {
+export function fetchCoinPairDetail(obj,id) {
   return function(dispatch,getState){
-    const { coinPairDetail } = getState();
+    //const { coinPairDetail } = getState();
     dispatch(fetchCoinPairDetailFull());
-    dispatch(fetchPairCoinDetailChart())
     return fetch(CoinCompareBaseUrl + priceMultiFull + "?" + buildURLParameters(obj))
            .then(response => response.json(),
             error => dispatch(fetchCoinPairDetailFullError(error))
           ).then(
             json => {
               let result = {
+                id:id,
                 RAW:json.RAW[obj.fsyms][obj.tsyms],
                 DISPLAY:json.DISPLAY[obj.fsyms][obj.tsyms]
               }
               dispatch(fetchCoinPairDetailFullSuccess(result))
-              let msg = {fsym:obj.fsyms,tsym:obj.tsyms,e:obj.e};
-              dispatch(fetchCoinPairHistoryChart(msg,coinPairDetail.coinPairPriceHistory.visibilityFilter))
             })
   }
 }
 
-function fetchCoinPairHistoryOneHour(idObj){
+function fetchCoinPairHistoryOneHour(idObj,id){
   let argumentState = Object.assign({},idObj);
   argumentState.aggregate=1;
   argumentState.limit=60;
   argumentState.tryConversion=false;
 
   return function(dispatch) {
+    dispatch(fetchPairCoinDetailChart())
     return fetch(CoinCompareBaseUrl + HistoMinute + "?" +buildURLParameters(argumentState))
             .then(response => response.json())
             .then(json => {
               let lineData = json.Data.map((d => [d.time * 1000,d.close]));
               let rsult = {
+                id:uuidv1(),
+                coinPairId:id,
                 data:json.Data,
                 lineData:lineData
               };
@@ -301,18 +309,21 @@ function fetchCoinPairHistoryOneHour(idObj){
   }
 }
 
-function fetchCoinPairHistoryOneWeek(idObj){
+function fetchCoinPairHistoryOneWeek(idObj,id){
   let argumentState = Object.assign({},idObj);
   argumentState.aggregate=1;
   argumentState.limit=168;
   argumentState.tryConversion=false;
 
   return function(dispatch) {
+    dispatch(fetchPairCoinDetailChart());
     return fetch(CoinCompareBaseUrl + HisToHour + "?" + buildURLParameters(argumentState))
           .then(response => response.json())
           .then(json => {
             let lineData = json.Data.map((d => [d.time * 1000,d.close]));
             let rsult = {
+              id:uuidv1(),
+              coinPairId:id,
               data:json.Data,
               lineData:lineData
             };
@@ -325,13 +336,13 @@ function fetchCoinPairHistoryOneWeek(idObj){
 /*
 idObj {fsym:obj.fsyms,tsym:obj.tsyms,e:obj.e};
 */
-export function fetchCoinPairHistoryChart(idObj, visibilityFilter){
+export function fetchCoinPairHistoryChart(idObj, visibilityFilter,id){
   switch (visibilityFilter) {
     case priceHistoryOneWeek:
-      return fetchCoinPairHistoryOneWeek(idObj);
+      return fetchCoinPairHistoryOneWeek(idObj,id);
     case priceHistoryOneHour:
-      return fetchCoinPairHistoryOneHour(idObj);
+      return fetchCoinPairHistoryOneHour(idObj,id);
     default:
-      return fetchCoinPairHistoryOneWeek(idObj);
+      return fetchCoinPairHistoryOneWeek(idObj,id);
   }
 }

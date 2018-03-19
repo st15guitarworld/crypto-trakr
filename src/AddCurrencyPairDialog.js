@@ -1,7 +1,7 @@
 import React,{ Component } from 'react';
 import Dialog from 'material-ui/Dialog'
 import currencies,{getNameFromSymbol,getFullNameFromSymbol} from './currencies';
-import {resetCurrentNewCoinPairAction,fetchAndAddFavoriteCoinPairPrice} from './actions';
+import {resetCurrentNewCoinPairAction,fetchOrRefreshFavoriteCoinPair} from './actions';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -19,7 +19,7 @@ const mapStateToProps = (state,props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    addNewFavoriteCoinPair:(e)=> dispatch(fetchAndAddFavoriteCoinPairPrice(e))
+    addNewFavoriteCoinPair:(e,id)=> dispatch(fetchOrRefreshFavoriteCoinPair(e,id))
   };
 }
 

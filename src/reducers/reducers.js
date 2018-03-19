@@ -2,13 +2,15 @@ import { combineReducers, createStore } from 'redux';
 import allCoins from './AllCoins';
 import allExchanges from './AllExchanges';
 import favoriteCoinPairs from './FavoriteCoinPairs';
-import coinPairDetail from './CoinPairDetail';
-
+import favoriteCoinPairDetails from './FavoriteCoinPairDetail';
+import favoriteCoinPairPriceHistory from './FavoriteCoinPairPriceHistory';
+import selectedFavoriteCoinPair from './SelectedFavoriteCoinPair';
 const rootReducer = combineReducers({
+  selectedFavoriteCoinPair,
   allCoins,
   allExchanges,
-  favoriteCoinPairs,
-  coinPairDetail
+  favoriteCoinPairDetails,
+  favoriteCoinPairPriceHistory
 })
 
 export default rootReducer;

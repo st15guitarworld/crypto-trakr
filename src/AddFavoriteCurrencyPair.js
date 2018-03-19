@@ -3,7 +3,7 @@ import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
 import NavigationArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import currencies,{getNameFromSymbol,getFullNameFromSymbol} from './currencies';
-import {resetCurrentNewCoinPairAction,fetchAndAddFavoriteCoinPairPrice} from './actions';
+import {fetchOrRefreshFavoriteCoinPair} from './actions';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import MenuItem from 'material-ui/MenuItem';
@@ -21,7 +21,7 @@ const mapStateToProps = (state,props) => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    addNewFavoriteCoinPair:(e)=> dispatch(fetchAndAddFavoriteCoinPairPrice(e))
+    addNewFavoriteCoinPair:(e)=> dispatch(fetchOrRefreshFavoriteCoinPair(e))
   };
 }
 
@@ -85,7 +85,7 @@ class AddFavoriteCurrencyPair extends Component {
   handlePairAdded(){
     let validated = this.validate();
     if(validated){
-      this.props.addNewFavoriteCoinPair({fsym:this.state.fromSym.value,
+      this.props.addNewFavoriteCoinPair({fsyms:this.state.fromSym.value,
                                         tsyms:this.state.toSym.value,
                                         e:this.state.exchange
     });

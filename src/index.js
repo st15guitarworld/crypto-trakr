@@ -22,7 +22,8 @@ const store = createStore(
 store.subscribe(()=>{
   console.log(store.getState());
   saveState({
-    "favoriteCoinPairs":store.getState().favoriteCoinPairs
+    "favoriteCoinPairDetails":store.getState().favoriteCoinPairDetails,
+    "favoriteCoinPairPriceHistory":store.getState().favoriteCoinPairPriceHistory
   })
 })
 

@@ -19,16 +19,16 @@ class CoinDetail extends Component {
     tsym:this.props.coinPairDetailRAW.TOSYMBOL,
     e:this.props.coinPairDetailRAW.MARKET};
 
-    this.props.fetchCoinPairHistoryChart(idObj, visibilityFilter);
+    this.props.fetchCoinPairHistoryChart(idObj, visibilityFilter,this.props.coinPairDetail.id + "");
   }
   renderChart(){
-    if(!_.isEmpty(this.props.coinPairHistory.coinPairPriceHistory.lineData)){
-     let minimumValueOfChart =_.min(this.props.coinPairHistory.coinPairPriceHistory.lineData,(a)=> a[1]);
-    return <LineStockChart min={minimumValueOfChart[1]} data={this.props.coinPairHistory.coinPairPriceHistory.lineData}/>;
+    if(!_.isEmpty(this.props.coinPairHistory.lineData)){
+     let minimumValueOfChart =_.min(this.props.coinPairHistory.lineData,(a)=> a[1]);
+    return <LineStockChart min={minimumValueOfChart[1]} data={this.props.coinPairHistory.lineData}/>;
    }
   }
   render(){
-    let activeItem = this.props.coinPairHistory.visibilityFilter;
+    let activeItem = this.props.visibilityFilter;
     return (
       <div>
       <div className="coin-detail-item">
