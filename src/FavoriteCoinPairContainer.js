@@ -8,23 +8,26 @@ import Divider from 'material-ui/Divider';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import PullToRefresh from './PullToRefresh';
-import {refreshAllFavoriteCoinPairs} from './actions';
-import {setSelectedFavoriteCoinPair} from './actions';
+import {refreshAllFavoriteCoinPairs,setSelectedFavoriteCoinPair,updateCoinPairFull} from './actions';
 import RefreshIndicator from 'material-ui/RefreshIndicator';
 import _ from "underscore";
 import Hammer from 'hammerjs';
 import ReactDOM from 'react-dom';
+import openSocket from 'socket.io-client';
+import CCC from "./ccc-streamer-utilities";
+import TabBarNav from './TabBarNav';
+import CryptoSubHelper from './CryptoSubHelper';
 
 const addButtonStyle = {
   position:"fixed",
-  bottom:"5%",
+  bottom:"9%",
   right:"4%",
   zIndex:"10"
 }
-
 const mapStateToProps = (state,props) => {
   return {
     favoriteCoinPairs:state.favoriteCoinPairDetails.coinPairDetail,
+    subs:CryptoSubHelper.generateSubsFromCoinDetails(state.favoriteCoinPairDetails.coinPairDetail),
     isLoading:state.allExchanges.isFetching && state.allCoins.isFetching
   };
 }
@@ -32,7 +35,8 @@ const mapStateToProps = (state,props) => {
 const mapDispatchToProps = dispatch => {
   return {
     refreshFavsCoinPairs:() => dispatch(refreshAllFavoriteCoinPairs()),
-    selectedFavoriteCoinPair:(id) => dispatch(setSelectedFavoriteCoinPair(id))
+    selectedFavoriteCoinPair:(id) => dispatch(setSelectedFavoriteCoinPair(id)),
+    updateFavoriteCoinPair:(update) => dispatch(updateCoinPairFull(update))
   };
 }
 
@@ -201,6 +205,26 @@ class FavoriteCoinPairContainer extends Component {
     this.closeDialog = this.closeDialog.bind(this);
     this.openDialog = this.openDialog.bind(this);
   }
+  componentDidMount(){
+    let that =this;
+    if(that.props.subs.length > 0 && !that.socket){
+      that.socket = openSocket('https://streamer.cryptocompare.com/');
+      that.socket.on("m",(message) => that.props.updateFavoriteCoinPair(CCC.CURRENT.unpack(message)));
+    }
+  }
+  componentWillUnmount(){
+      if(this.socket){
+          this.socket.emit('SubRemove', { subs: this.props.subs } );
+          this.socket.disconnect();
+          this.socket = undefined;
+      }
+  }
+  componentDidUpdate(prevProps, prevState) {
+    if(this.props.subs.length > prevProps.subs.length){
+      this.socket.emit('SubRemove', { subs: prevProps.subs } );
+      this.socket.emit('SubAdd', { subs: this.props.subs } );
+    }
+  }
   closeDialog() {
     this.setState({dialogOpen:false})
   }
@@ -225,6 +249,7 @@ class FavoriteCoinPairContainer extends Component {
     <FloatingActionButton style={addButtonStyle} onClick={() => this.props.history.push("addFavoriteCurrencyPair")}>
      <ContentAdd />
    </FloatingActionButton>
+    <TabBarNav {...this.props}/>
     </div>
     );
   }

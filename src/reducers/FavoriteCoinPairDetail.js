@@ -1,7 +1,9 @@
 import { combineReducers, createStore } from 'redux';
 import {FETCH_COIN_PAIR_DETAIL_FULL,FETCH_COIN_PAIR_DETAIL_FULL_ERROR,
-FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS} from '../actions';
+FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS,UPDATE_COIN_PAIR_DETAIL_FULL} from '../actions';
 import _ from "underscore";
+import CCC from "../ccc-streamer-utilities";
+
 let coinPairDetailDefault = {
 
 }
@@ -17,7 +19,17 @@ switch (action.type) {
     newState.push(action.coinPairDetail);
   }
     return newState;
-    break;
+    case UPDATE_COIN_PAIR_DETAIL_FULL:
+    const {update} = action;
+      if (update.PRICE) {
+        let updatedCoinPairIndex = _.findIndex(newState, e => e.RAW.MARKET == update.MARKET &&
+          e.RAW.FROMSYMBOL == update.FROMSYMBOL && e.RAW.TOSYMBOL == update.TOSYMBOL );
+          newState[updatedCoinPairIndex].DISPLAY.PRICE = CCC.STATIC.CURRENCY.getSymbol(update.TOSYMBOL) + " " + update.PRICE;
+        return newState;
+      }else{
+        return state;
+      }
+      break;
   default:
     return state;
 }

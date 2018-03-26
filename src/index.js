@@ -16,7 +16,7 @@ const store = createStore(
   rootReducer,
   persistedState,
   applyMiddleware(
-    thunkMiddleware // lets us dispatch() function
+    thunkMiddleware, // lets us dispatch() function
   )
 )
 store.subscribe(()=>{
@@ -30,7 +30,7 @@ store.subscribe(()=>{
 const MyApp = () => (
    <Provider store={store}>
     <MuiThemeProvider>
-      <App/>
+      <App />
     </MuiThemeProvider>
    </Provider>
 );
