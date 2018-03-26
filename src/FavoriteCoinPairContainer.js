@@ -20,8 +20,8 @@ import CryptoSubHelper from './CryptoSubHelper';
 
 const addButtonStyle = {
   position:"fixed",
-  bottom:"9%",
-  right:"4%",
+  bottom:"12%",
+  right:"7%",
   zIndex:"10"
 }
 const mapStateToProps = (state,props) => {
@@ -184,7 +184,7 @@ class FavoriteCoinPairInner extends Component {
           <div key={index}>
           <ListItem key={pair.id} primaryText={pair.DISPLAY.PRICE} secondaryText={pair.RAW.FROMSYMBOL+" - "+ pair.RAW.TOSYMBOL + " "+ pair.RAW.MARKET}
             onClick={() => {
-              this.props.selectedFavoriteCoinPair(JSON.parse(JSON.stringify(pair.id))).then(r => this.props.history.push("coinDetail", {fsym:pair.RAW.FROMSYMBOL,e:pair.RAW.MARKET,tsyms:pair.RAW.TOSYMBOL}))
+              this.props.selectedFavoriteCoinPair(pair.id).then(r => this.props.history.push("coinDetail", {fsym:pair.RAW.FROMSYMBOL,e:pair.RAW.MARKET,tsyms:pair.RAW.TOSYMBOL}))
             }}
           />
            <Divider />

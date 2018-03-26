@@ -13,3 +13,14 @@ export const priceHistoryOneWeek = "1W";
 export const priceHistoryOneHour = "1H";
 export const priceHistoryOneMonth = "1M";
 export const priceHistoryThreeMonth = "3M";
+
+export const favoriteCoinPairNav = "";
+export const addFavoriteCoinPairNav = "addFavoriteCurrencyPair";
+export const coinDetailNav = "coinDetail";
+export const topListsNav = "toplists";
+export const newsNav = "news";
+
+export const TabNavigationsToIndex = {};
+TabNavigationsToIndex[favoriteCoinPairNav] = 0;
+TabNavigationsToIndex[topListsNav] = 1;
+TabNavigationsToIndex[newsNav] = 2;

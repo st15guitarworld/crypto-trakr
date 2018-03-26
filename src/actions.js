@@ -36,6 +36,15 @@ export const SET_PRICE_CHART_VISIBILITY_FILTER_1H = "SET_PRICE_CHART_VISIBILITY_
 export const SET_SELECTED_FAVORITE_COIN_PAIR = "SET_SELECTED_FAVORITE_COIN_PAIR";
 export const RESET_SELECTED_FAVORITE_COIN_PAIR = "RESET_SELECTED_FAVORITE_COIN_PAIR";
 
+export const SET_ACTIVE_TAB_BAR_NAV = "SET_ACTIVE_TAB_BAR_NAV";
+
+export function setActiveTabBarNav(nav){
+  return {
+    type:SET_ACTIVE_TAB_BAR_NAV,
+    nav:nav
+  }
+}
+
 export function resetSelectedFavoriteCoinPair() {
   return {
     type:RESET_SELECTED_FAVORITE_COIN_PAIR
