@@ -184,7 +184,7 @@ class FavoriteCoinPairInner extends Component {
           <div key={index}>
           <ListItem key={pair.id} primaryText={pair.DISPLAY.PRICE} secondaryText={pair.RAW.FROMSYMBOL+" - "+ pair.RAW.TOSYMBOL + " "+ pair.RAW.MARKET}
             onClick={() => {
-              this.props.selectedFavoriteCoinPair(pair.id).then(r => this.props.history.push("coinDetail", {fsym:pair.RAW.FROMSYMBOL,e:pair.RAW.MARKET,tsyms:pair.RAW.TOSYMBOL}))
+              this.props.selectedFavoriteCoinPair(pair.id).then(r => this.props.history.push("coinDetail"))
             }}
           />
            <Divider />
@@ -220,7 +220,7 @@ class FavoriteCoinPairContainer extends Component {
       }
   }
   componentDidUpdate(prevProps, prevState) {
-    if(this.props.subs.length > prevProps.subs.length){
+    if(this.props.subs.length > prevProps.subs.length && this.socket){
       this.socket.emit('SubRemove', { subs: prevProps.subs } );
       this.socket.emit('SubAdd', { subs: this.props.subs } );
     }
@@ -241,9 +241,7 @@ class FavoriteCoinPairContainer extends Component {
 
     return  (
       <div>
-    <AppBar title="Crypto-Trakr" className="favorite-coin-appbar" iconStyleRight={{
-      margin:0
-    }}>
+    <AppBar title="Crypto-Trakr" className="favorite-coin-appbar" showMenuIconButton={false}>
     </AppBar>
     <LoadingPaper {...favoriteCoinPairProps}/>
     <FloatingActionButton style={addButtonStyle} onClick={() => this.props.history.push("addFavoriteCurrencyPair")}>

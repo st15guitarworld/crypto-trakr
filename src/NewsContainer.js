@@ -6,7 +6,7 @@ export default class NewsContainer extends Component {
 render(){
   return (
     <div>
-      <AppBar title="News"/>
+      <AppBar title="News" showMenuIconButton={false}/>
       <TabBarNav {...this.props}/>
     </div>
   );

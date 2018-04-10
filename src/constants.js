@@ -8,6 +8,7 @@ export const CoinCompareSubs = "/data/subs"
 export const AllExchanges = "/data/all/exchanges";
 export const priceMultiFull = "/data/pricemultifull";
 export const price = "/data/price";
+export const topExchanges = "/data/top/exchanges/full";
 
 export const priceHistoryOneWeek = "1W";
 export const priceHistoryOneHour = "1H";

@@ -1073,5 +1073,9 @@ export function getFullNameFromSymbol(symbol){
     return currencies[symbol].name + " ("+symbol+")";
   }
 }
+export function convertCurrencyToCCC(currencySymbol){
+  return{FullName:getFullNameFromSymbol(currencySymbol),Name:currencySymbol}
+
+}
 
 export default currencies;

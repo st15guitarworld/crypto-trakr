@@ -144,10 +144,9 @@ class AddFavoriteCurrencyPair extends Component {
             floatingLabelText="From Currency"
             onChange={this.handleFromSymUpdate}
             fullWidth={true}
-            //errorText={this.state.fromSym.error ? this.state.fromSym.errorText : null}
             >
               {this.state.fromSyms.map(f => (
-                  <MenuItem key={f.Name} value={f.Name} primaryText={f.FullName} />
+                  <MenuItem key={f.FullName} value={f.Name} primaryText={f.FullName} />
                 ))}
       </SelectField>
       <SelectField

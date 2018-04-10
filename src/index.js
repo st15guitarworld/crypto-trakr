@@ -23,7 +23,9 @@ store.subscribe(()=>{
   console.log(store.getState());
   saveState({
     "favoriteCoinPairDetails":store.getState().favoriteCoinPairDetails,
-    "favoriteCoinPairPriceHistory":store.getState().favoriteCoinPairPriceHistory
+    "favoriteCoinPairPriceHistory":store.getState().favoriteCoinPairPriceHistory,
+    "activeTabBarNav":store.getState().activeTabBarNav,
+    "selectedFavoriteCoinPair":store.getState().selectedFavoriteCoinPair
   })
 })
 

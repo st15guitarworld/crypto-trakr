@@ -8,7 +8,7 @@
     "highcharts": "^5.0.14",
     "material-ui": "^0.20.0",
     "moment": "^2.20.1",
-    "react": "^16.2.0",
+    "react": "^16.3.0",
     "react-dom": "^16.2.0",
     "react-jsx-highcharts": "^2.1.0",
     "react-jsx-highstock": "^2.1.0",

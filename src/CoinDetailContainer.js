@@ -12,6 +12,7 @@ import {
 } from 'react-jsx-highstock';
 import CoinDetail from './CoinDetail';
 import _ from "underscore";
+
 const mapStateToProps = (state,props) => {
   let selectedFavoriteCoinPairDetail = _.find(state.favoriteCoinPairDetails.coinPairDetail,(d)=> d.id == state.selectedFavoriteCoinPair);
   let selectedFavoriteCoinPairHistory = _.find(state.favoriteCoinPairPriceHistory.coinPairPriceHistory.histories,(h) => h.coinPairId == selectedFavoriteCoinPairDetail.id)
@@ -35,11 +36,6 @@ const mapDispatchToProps = dispatch => {
 class CoinDetailContainer extends Component {
   constructor(props){
     super(props);
-    this.state = {
-      fsyms: props.history.location.state.fsym,
-      tsyms: props.history.location.state.tsyms,
-      e:props.history.location.state.e
-    }
     this.goBack = this.goBack.bind(this);
   }
   componentWillMount() {
@@ -53,13 +49,12 @@ class CoinDetailContainer extends Component {
   render(){
     let coinPairDetailProps = {
       Target: CoinDetail,
-      tsyms: this.state.tsyms,
       ...this.props
     }
 
     return (
     <div className="coin-detail-container">
-      <AppBar title={this.state.fsyms +" - "+this.state.tsyms} className="coin-detail-appbar" iconElementLeft={<IconButton onClick={this.goBack}><NavigationArrowBack /></IconButton>}>
+      <AppBar title={this.props.coinPairDetailRAW.FROMSYMBOL +" - "+this.props.coinPairDetailRAW.TOSYMBOL} className="coin-detail-appbar" iconElementLeft={<IconButton onClick={this.goBack}><NavigationArrowBack /></IconButton>}>
       </AppBar>
       <LoadingPaper {...coinPairDetailProps}/>
     </div>

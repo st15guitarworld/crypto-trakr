@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
-price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute} from './constants';
+price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute
+, topExchanges} from './constants';
 import uuidv1 from 'uuid/v1';
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
@@ -30,6 +31,10 @@ export const FETCH_COIN_PAIR_DETAIL_CHART = "FETCH_COIN_PAIR_DETAIL_CHART";
 export const FETCH_COIN_PAIR_DETAIL_CHART_ERROR = "FETCH_COIN_PAIR_DETAIL_CHART_ERROR";
 export const FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS = "FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS";
 
+export const FETCH_TOP_EXCHANGES = "FETCH_TOP_EXCHANGES";
+export const FETCH_TOP_EXCHANGES_ERROR = "FETCH_TOP_EXCHANGES_ERROR";
+export const FETCH_TOP_EXCHANGES_SUCCESS = "FETCH_TOP_EXCHANGES_SUCCESS";
+
 export const SET_PRICE_CHART_VISIBILITY_FILTER_1W = "SET_PRICE_CHART_VISIBILITY_FILTER_1W";
 export const SET_PRICE_CHART_VISIBILITY_FILTER_1H = "SET_PRICE_CHART_VISIBILITY_FILTER_1H";
 
@@ -37,6 +42,20 @@ export const SET_SELECTED_FAVORITE_COIN_PAIR = "SET_SELECTED_FAVORITE_COIN_PAIR"
 export const RESET_SELECTED_FAVORITE_COIN_PAIR = "RESET_SELECTED_FAVORITE_COIN_PAIR";
 
 export const SET_ACTIVE_TAB_BAR_NAV = "SET_ACTIVE_TAB_BAR_NAV";
+export const SET_TOP_EXCHANGES_CURRENCIES = "SET_TOP_EXCHANGES_CURRENCIES";
+
+export function fetchTopExchangesSuccess(data){
+  return {
+    type:FETCH_TOP_EXCHANGES_SUCCESS,
+    data:data
+  }
+}
+
+export function fetchTopExchangesAction(){
+  return {
+    type:FETCH_TOP_EXCHANGES
+  }
+}
 
 export function setActiveTabBarNav(nav){
   return {
@@ -50,12 +69,14 @@ export function resetSelectedFavoriteCoinPair() {
     type:RESET_SELECTED_FAVORITE_COIN_PAIR
   }
 }
+
 export function updateCoinPairFull(update) {
   return {
     type:UPDATE_COIN_PAIR_DETAIL_FULL,
     update
   }
 }
+
 export function setSelectedFavoriteCoinPair(id) {
   return dispatch => {
     return new Promise((resolve,reject) => {
@@ -66,6 +87,26 @@ export function setSelectedFavoriteCoinPair(id) {
     resolve();
   })
 }
+}
+
+function setTopExchangesCurrencies(obj) {
+  return dispatch => {
+    return new Promise((resolve,reject) => {
+      dispatch({
+      type:SET_TOP_EXCHANGES_CURRENCIES,
+      fsym:obj.fsym,
+      tsym:obj.tsym
+    });
+    resolve();
+  })
+}
+}
+
+export function topExchangesCurrencyChange(obj){
+  return function(dispatch){
+    dispatch(setTopExchangesCurrencies(obj))
+    .then(dispatch(fetchTopExchanges()));
+  }
 }
 
 export function setPriceChartVisibilityFilter1W(){
@@ -145,12 +186,14 @@ function fetchAllCoinsAction(){
      type: FETCH_ALL_COINS
   }
 }
+
 function fetchAllCoinsError(error){
   return {
      type: FETCH_ALL_COINS_ERROR,
      error:error
   }
 }
+
 function fetchAllCoinsSuccess(returned){
   return {
      type: FETCH_ALL_COINS_SUCCESS,
@@ -171,6 +214,7 @@ function fetchAllExchangesActionError(error){
      error:error
   }
 }
+
 function fetchAllExchangesActionSuccess(returned){
   return {
      type: FETCH_ALL_EXCHANGES_SUCCESS,
@@ -183,12 +227,14 @@ function fetchCurrentNewCoinPairAction(){
      type: FETCH_CURRENT_NEW_COIN_PAIRS
   }
 }
+
 function fetchCurrentNewCoinPairActionError(error){
   return {
      type: FETCH_CURRENT_NEW_COIN_PAIRS_ERROR,
      error:error
   }
 }
+
 function fetchCurrentNewCoinPairActionSuccess(returned){
   return {
      type: FETCH_CURRENT_NEW_COIN_PAIRS_SUCCESS,
@@ -362,4 +408,21 @@ export function fetchCoinPairHistoryChart(idObj, visibilityFilter,id){
     default:
       return fetchCoinPairHistoryOneWeek(idObj,id);
   }
+}
+
+export function fetchTopExchanges() {
+    return function(dispatch, getState){
+      let state = getState();
+      let request = {
+        fsym:state.topExchanges.exchangesCurrencies.fsym,
+        tsym:state.topExchanges.exchangesCurrencies.tsym,
+        limit:10
+      };
+      dispatch(fetchTopExchangesAction());
+      return fetch(CoinCompareBaseUrl + topExchanges + "?" + buildURLParameters(request))
+              .then(response => response.json())
+              .then(json => {
+                dispatch(fetchTopExchangesSuccess(json.Data.Exchanges));
+              });
+    }
 }

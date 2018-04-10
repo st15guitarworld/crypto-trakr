@@ -1,8 +1,6 @@
 import { combineReducers, createStore } from 'redux';
 import {FETCH_ALL_EXCHANGES,FETCH_ALL_EXCHANGES_ERROR,FETCH_ALL_EXCHANGES_SUCCESS } from '../actions'
 
-
-
 function allExchanges(state ={},action) {
 switch (action.type) {
   case FETCH_ALL_EXCHANGES_SUCCESS:
