@@ -1,7 +1,6 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
-price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute
-, topExchanges} from './constants';
+price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute, topExchanges,topPairsTotalVolume} from './constants';
 import uuidv1 from 'uuid/v1';
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
@@ -44,6 +43,15 @@ export const RESET_SELECTED_FAVORITE_COIN_PAIR = "RESET_SELECTED_FAVORITE_COIN_P
 export const SET_ACTIVE_TAB_BAR_NAV = "SET_ACTIVE_TAB_BAR_NAV";
 export const SET_TOP_EXCHANGES_CURRENCIES = "SET_TOP_EXCHANGES_CURRENCIES";
 
+export const SET_TOP_TO_PAIR = "SET_TOP_TO_PAIR";
+export const FETCH_TOP_PAIRS_SUCCESS = "FETCH_TOP_PAIRS_SUCCESS";
+
+export function fetchTopPairsSuccess(data) {
+  return {
+    type:FETCH_TOP_PAIRS_SUCCESS,
+    data:data
+  }
+}
 export function fetchTopExchangesSuccess(data){
   return {
     type:FETCH_TOP_EXCHANGES_SUCCESS,
@@ -88,7 +96,7 @@ export function setSelectedFavoriteCoinPair(id) {
   })
 }
 }
-
+// pin is www.irs.gov/getanippin
 function setTopExchangesCurrencies(obj) {
   return dispatch => {
     return new Promise((resolve,reject) => {
@@ -408,6 +416,18 @@ export function fetchCoinPairHistoryChart(idObj, visibilityFilter,id){
     default:
       return fetchCoinPairHistoryOneWeek(idObj,id);
   }
+}
+export function fetchTopPairs() {
+    return function(dispatch, getState) {
+      let state = getState();
+      let request = {
+        tsym: state.topPairs.topToPair,
+        limit:10
+      };
+      return fetch(CoinCompareBaseUrl + topPairsTotalVolume + "?" + buildURLParameters(request))
+              .then(response => response.json())
+              .then(json => dispatch(fetchTopPairsSuccess(json.Data)))
+    }
 }
 
 export function fetchTopExchanges() {
