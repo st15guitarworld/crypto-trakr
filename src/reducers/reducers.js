@@ -5,14 +5,12 @@ import favoriteCoinPairs from './FavoriteCoinPairs';
 import favoriteCoinPairDetails from './FavoriteCoinPairDetail';
 import favoriteCoinPairPriceHistory from './FavoriteCoinPairPriceHistory';
 import selectedFavoriteCoinPair from './SelectedFavoriteCoinPair';
-import activeTabBarNav from './activeTabBarNav';
 import topExchanges from './TopExchanges';
 import topPairs from './TopPairs';
 
 const rootReducer = combineReducers({
   topPairs,
   selectedFavoriteCoinPair,
-  activeTabBarNav,
   allCoins,
   allExchanges,
   favoriteCoinPairDetails,

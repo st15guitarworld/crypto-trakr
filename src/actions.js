@@ -65,13 +65,6 @@ export function fetchTopExchangesAction(){
   }
 }
 
-export function setActiveTabBarNav(nav){
-  return {
-    type:SET_ACTIVE_TAB_BAR_NAV,
-    nav:nav
-  }
-}
-
 export function resetSelectedFavoriteCoinPair() {
   return {
     type:RESET_SELECTED_FAVORITE_COIN_PAIR
