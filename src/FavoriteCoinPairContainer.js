@@ -149,7 +149,10 @@ class FavoriteCoinPairInner extends Component {
     const ptrElOffsetHeight = this.ptrElement ? this.ptrElement.offsetHeight : 0;
     const percentageofLoading = Math.min(distance/this.state.distanceToRefresh * 100,100);
   return (
-    <div id="FavoriteCoinPairInner" style={this.props.style}>
+    <div id="FavoriteCoinPairInner" style={{
+      height: document.body.scrollHeight - 120 + "px",
+      overflow:"scroll"
+    }}>
       <div
         style={{
           WebkitTransform:"translate3d( 0,"+(distance - ptrElOffsetHeight)+ "px,0)",
@@ -176,6 +179,8 @@ class FavoriteCoinPairInner extends Component {
       <List
         ref={(content) => { this.contentElement = ReactDOM.findDOMNode(content); }}
         style={{
+        //  height: document.body.scrollHeight - 120 + "px",
+        //  overflow:"scroll",
           WebkitTransform: this.state.isLoading ? "translate3d( 0, 50px, 0 )" : "translate3d( 0,"+ distance + "px,0)",
           transition:!this.state.enabled && this.state.pan.distance == 0 ? "all .25s ease" : "none"
         }}
