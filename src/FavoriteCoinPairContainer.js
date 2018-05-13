@@ -135,7 +135,7 @@ class FavoriteCoinPairInner extends Component {
   }
   componentDidMount(){
     if(!this.h){
-      this.h = new Hammer(this.contentElement);
+      this.h = new Hammer(this.contentElement, { "touchAction": 'auto'});
       this.h.get( 'pan' ).set( { direction: Hammer.DIRECTION_VERTICAL } );
 
     this.h.on( 'panstart', this._panStart );
