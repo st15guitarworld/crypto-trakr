@@ -5,6 +5,7 @@ import SelectField from 'material-ui/SelectField';
 import _ from "underscore";
 import currencies,{getNameFromSymbol,getFullNameFromSymbol,convertCurrencyToCCC} from './currencies';
 import {topExchangesCurrencyChange} from "./actions"
+import RaisedButton from 'material-ui/RaisedButton';
 
 function calculateFromSyms(coins,supportedFromSyms) {
   if(coins.length == 0 || supportedFromSyms.length == 0) {
@@ -63,10 +64,7 @@ class TopExchangesForm extends Component{
     let newState = Object.assign({},this.state);
     newState.tsym = selectedTSym.Name;
     let that = this;
-    this.setState(newState,function(){
-        let obj = {fsym:that.state.fsym,tsym:that.state.tsym};
-        that.props.onTopExchangesCurrencyChange(obj);
-    });
+    this.setState(newState);
   }
   handleFsymChange(event,index){
     let selectedFSYM = this.state.fsyms[index];
@@ -87,25 +85,37 @@ class TopExchangesForm extends Component{
   render(){
   return (
     <div style={{
-      display: "flex",
-      justifyContent: "center"
+      padding:"0px 15px",
+      display:"relative",
+      height: "100%",
+      overflow: "hidden"
     }}>
       <SelectField
-        floatingLabelText="from currency"
+        floatingLabelText="From Currency"
        value={this.state.fsym}
+       fullWidth={true}
        onChange={this.handleFsymChange}>
        {this.state.fsyms.map(f => (
          <MenuItem key={f.FullName} value={f.Name} primaryText={f.FullName} />
        )) }
       </SelectField>
       <SelectField
-       floatingLabelText="to currency"
+       floatingLabelText="To Currency"
        value={this.state.tsym}
+       fullWidth={true}
        onChange={this.handleTsymChange}>
        {this.state.tsyms.map(f => (
          <MenuItem key={f.FullName} value={f.Name} primaryText={f.FullName} />
        )) }
       </SelectField>
+      <RaisedButton style = {{
+        position:"absolute",
+        bottom:"20px",
+        left:"0px",
+        right:"0px"
+      }} label="Set Filters" primary={true} disabled={!this.state.fsym || !this.state.tsym}
+      onClick={() => this.props.onTopExchangesCurrencyChange({fsym:this.state.fsym,tsym:this.state.tsym}).then(this.props.close)}
+    />
     </div>
   )
 }

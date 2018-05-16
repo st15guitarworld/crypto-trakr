@@ -25,9 +25,9 @@ render(){
   return (
     <div style={{
       height: document.body.scrollHeight - 120 + "px",
-    overflow:"scroll"
+      overflow:"scroll"
   }}>
-      <AppBar title="TopLists" showMenuIconButton={false}/>
+      <AppBar title="TopLists" showMenuIconButton={false} />
       <TopListsInner />
       <TabBarNav {...this.props}/>
     </div>

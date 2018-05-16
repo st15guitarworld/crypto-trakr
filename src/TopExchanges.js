@@ -5,6 +5,9 @@ import {fetchTopExchanges} from "./actions";
 import TableBuilder from "./TableBuilder";
 import CCC from "./ccc-streamer-utilities";
 import TopExchangesForm from "./TopExchangesForm";
+import FilterList from 'material-ui/svg-icons/content/filter-list';
+import FlatButton from 'material-ui/FlatButton';
+import ScrollUp from './ScrollUp.js';
 
 function topExchangesRawToDisplay(exhanges) {
   return exhanges.map(exchange => ({
@@ -27,6 +30,15 @@ const mapDispatchToProps = dispatch => {
 }
 
 class TopExchanges extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.state.filterIsOpen = false;
+    this.closeFilters = this.closeFilters.bind(this);
+  }
+  closeFilters() {
+    this.setState({filterIsOpen:false});
+  }
   componentWillMount(){
     this.props.fetchTheTopExchanges();
   }
@@ -34,8 +46,20 @@ class TopExchanges extends Component {
 
     return (
       <div>
-      <TopExchangesForm />
+        <FlatButton
+      icon={<FilterList/>}
+      style={{
+        float:"right"
+      }}
+      onClick={()=> this.setState({filterIsOpen:true})}
+    />
+      {/* <TopExchangesForm /> */}
+      <div style={{clear:"both"}}>
       {TableBuilder.buildSimpleTable(this.props.data)}
+      </div>
+      <ScrollUp isOpen={this.state.filterIsOpen} title="Filters" close={this.closeFilters}>
+        <TopExchangesForm close={this.closeFilters}/>
+     </ScrollUp>
       </div>
     );
 

@@ -60,10 +60,11 @@ class FavoriteCoinPairInner extends Component {
   }
   _panStart(e) {
     console.log("pan start");
-    let newState = _.extend({},this.state);
-    newState.pan.startingPositionY = document.body.scrollTop;
+    console.log(e);
+     let newState = _.extend({},this.state);
+    // newState.pan.startingPositionY += e.deltaY;
     this.setState(newState,()=>{
-      if (this.state.pan.startingPositionY === 0 ) {
+      if (this.state.pan.startingPositionY == 0 ) {
         let newState2 = _.extend({},this.state);
         newState2.isLoading = false;
         newState2.pan.enabled=true;
@@ -72,12 +73,16 @@ class FavoriteCoinPairInner extends Component {
   }
   _panUp(e){
     console.log("pan up");
+    let newState = _.extend({},this.state);
+    newState.pan.startingPositionY += e.deltaY;
+    this.setState(newState);
+
       if ( ! this.state.pan.enabled || this.state.pan.distance === 0 ) {
       return;
     }
 
     e.preventDefault();
-      let newState = _.extend({},this.state);
+      newState = _.extend({},this.state);
     if ( this.state.pan.distance < e.distance / this.state.resistance ) {
       newState.pan.distance=0;
       this.setState(newState);
@@ -125,11 +130,14 @@ class FavoriteCoinPairInner extends Component {
 
   _panDown(e){
     console.log("pan down");
+    let newState = _.extend({},this.state);
+    newState.pan.startingPositionY += e.deltaY;
+    this.setState(newState);
       if ( ! this.state.pan.enabled ) {
       return;
       }
       e.preventDefault();
-      let newState = _.extend({},this.state);
+      newState = _.extend({},this.state);
       newState.pan.distance = e.distance / this.state.resistance;
       this.setState(newState);
   }
@@ -178,9 +186,9 @@ class FavoriteCoinPairInner extends Component {
           </div>
       <List
         ref={(content) => { this.contentElement = ReactDOM.findDOMNode(content); }}
+        id="favoriteCoinPairList"
         style={{
         //  height: document.body.scrollHeight - 120 + "px",
-        //  overflow:"scroll",
           WebkitTransform: this.state.isLoading ? "translate3d( 0, 50px, 0 )" : "translate3d( 0,"+ distance + "px,0)",
           transition:!this.state.enabled && this.state.pan.distance == 0 ? "all .25s ease" : "none"
         }}

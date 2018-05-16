@@ -105,7 +105,7 @@ function setTopExchangesCurrencies(obj) {
 
 export function topExchangesCurrencyChange(obj){
   return function(dispatch){
-    dispatch(setTopExchangesCurrencies(obj))
+    return dispatch(setTopExchangesCurrencies(obj))
     .then(dispatch(fetchTopExchanges()));
   }
 }
