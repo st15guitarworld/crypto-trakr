@@ -8,8 +8,8 @@ import Delete from 'material-ui/svg-icons/action/delete';
 
 const deleteIconStyles = {
   color:"white",
-  height:"40",
-  width:"40",
+  height:"30",
+  width:"30",
 };
 export default class FavoriteCoinPairItem extends Component {
   constructor(props) {
@@ -31,7 +31,7 @@ export default class FavoriteCoinPairItem extends Component {
       this.h.get( 'pan' ).set( { direction: Hammer.DIRECTION_HORIZONTAL } );
 
       this.h.on( 'panstart', (e) => {
-        if(this.props.parentIsPanning) {
+        if(this.props.parentIsPanning && !this.state.pan.enabled) {
           this.props.setChildPanning(false);
           return;
         }
@@ -42,7 +42,7 @@ export default class FavoriteCoinPairItem extends Component {
         this.setState(newState2);
       } );
      this.h.on( 'panleft', (e) => {
-       if(!this.state.pan.enabled || this.props.parentIsPanning) {
+       if(!this.state.pan.enabled && this.props.parentIsPanning) {
          return;
        }
        let newState = _.extend({},this.state);
@@ -64,8 +64,9 @@ export default class FavoriteCoinPairItem extends Component {
         this.setState(newState);
         this.props.setChildPanning(false);
     } );
+
      this.h.on( 'panright', (e) =>{
-       if(this.props.parentIsPanning) {
+       if(this.props.parentIsPanning && !this.state.pan.enabled) {
          return;
        }
        let newState = _.extend({},this.state);
