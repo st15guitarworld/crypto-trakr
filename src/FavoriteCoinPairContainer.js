@@ -17,6 +17,7 @@ import openSocket from 'socket.io-client';
 import CCC from "./ccc-streamer-utilities";
 import TabBarNav from './TabBarNav';
 import CryptoSubHelper from './CryptoSubHelper';
+import FavoriteCoinPairItem from './FavoriteCoinPairItem';
 
 const addButtonStyle = {
   position:"fixed",
@@ -45,6 +46,8 @@ class FavoriteCoinPairInner extends Component {
       super(props);
       this.state = {
           isLoading:false,
+          isPanning:false,
+          isChildPaning:false,
           distanceToRefresh: 70,
           resistance: 2.5,
           pan:{
@@ -57,14 +60,21 @@ class FavoriteCoinPairInner extends Component {
       this._panUp = this._panUp.bind(this);
       this._panEnd = this._panEnd.bind(this);
       this._panDown = this._panDown.bind(this);
+      this.setIsChildPanning = this.setIsChildPanning.bind(this);
   }
+  setIsChildPanning(value){
+    let newState = _.extend({},this.state);
+    newState.isChildPaning = value;
+    this.setState(newState);
+  }
+
   _panStart(e) {
     console.log("pan start");
     console.log(e);
      let newState = _.extend({},this.state);
-    // newState.pan.startingPositionY += e.deltaY;
+     newState.isPanning = true;
     this.setState(newState,()=>{
-      if (this.state.pan.startingPositionY == 0 ) {
+      if (this.state.pan.startingPositionY == 0 && !this.state.isChildPaning) {
         let newState2 = _.extend({},this.state);
         newState2.isLoading = false;
         newState2.pan.enabled=true;
@@ -73,16 +83,13 @@ class FavoriteCoinPairInner extends Component {
   }
   _panUp(e){
     console.log("pan up");
-    let newState = _.extend({},this.state);
-    newState.pan.startingPositionY += e.deltaY;
-    this.setState(newState);
 
       if ( ! this.state.pan.enabled || this.state.pan.distance === 0 ) {
       return;
     }
 
     e.preventDefault();
-      newState = _.extend({},this.state);
+      let newState = _.extend({},this.state);
     if ( this.state.pan.distance < e.distance / this.state.resistance ) {
       newState.pan.distance=0;
       this.setState(newState);
@@ -106,12 +113,15 @@ class FavoriteCoinPairInner extends Component {
   }
   _panEnd(e){
     console.log("pan end");
+    let newState = _.extend({},this.state);
+    newState.isPanning = false;
+    this.setState(newState);
     if ( ! this.state.pan.enabled ) {
     return;
   }
 
   e.preventDefault();
-  let newState = _.extend({},this.state);
+   newState = _.extend({},this.state);
   if(this.state.pan.distance >= this.state.distanceToRefresh){
     newState.isLoading=true;
     this.setState(newState);
@@ -130,14 +140,11 @@ class FavoriteCoinPairInner extends Component {
 
   _panDown(e){
     console.log("pan down");
-    let newState = _.extend({},this.state);
-    newState.pan.startingPositionY += e.deltaY;
-    this.setState(newState);
       if ( ! this.state.pan.enabled ) {
       return;
       }
       e.preventDefault();
-      newState = _.extend({},this.state);
+      let newState = _.extend({},this.state);
       newState.pan.distance = e.distance / this.state.resistance;
       this.setState(newState);
   }
@@ -188,20 +195,12 @@ class FavoriteCoinPairInner extends Component {
         ref={(content) => { this.contentElement = ReactDOM.findDOMNode(content); }}
         id="favoriteCoinPairList"
         style={{
-        //  height: document.body.scrollHeight - 120 + "px",
           WebkitTransform: this.state.isLoading ? "translate3d( 0, 50px, 0 )" : "translate3d( 0,"+ distance + "px,0)",
           transition:!this.state.enabled && this.state.pan.distance == 0 ? "all .25s ease" : "none"
         }}
         >
         {this.props.favoriteCoinPairs.map((pair,index)=>(
-          <div key={index}>
-          <ListItem key={pair.id} primaryText={pair.DISPLAY.PRICE} secondaryText={pair.RAW.FROMSYMBOL+" - "+ pair.RAW.TOSYMBOL + " "+ pair.RAW.MARKET}
-            onClick={() => {
-              this.props.selectedFavoriteCoinPair(pair.id).then(r => this.props.history.push("coinDetail"))
-            }}
-          />
-           <Divider />
-         </div>
+        <FavoriteCoinPairItem pair={pair} {...this.props} setChildPanning={this.setIsChildPanning} parentIsPanning={this.state.isPanning}/>
         ))}
       </List>
     </div>
