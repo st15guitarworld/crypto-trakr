@@ -1,6 +1,6 @@
 import { combineReducers, createStore } from 'redux';
 import {FETCH_COIN_PAIR_DETAIL_FULL,FETCH_COIN_PAIR_DETAIL_FULL_ERROR,
-FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS,UPDATE_COIN_PAIR_DETAIL_FULL} from '../actions';
+FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS,UPDATE_COIN_PAIR_DETAIL_FULL,REMOVE_FAVORITE_COIN_PAIR} from '../actions';
 import _ from "underscore";
 import CCC from "../ccc-streamer-utilities";
 
@@ -11,6 +11,12 @@ let coinPairDetailDefault = {
 function coinPairDetail(state =[],action) {
   let newState = JSON.parse(JSON.stringify(state));
 switch (action.type) {
+  case REMOVE_FAVORITE_COIN_PAIR:
+  let itemToDeleteIndex = _.findIndex(newState, e=> e.id == action.id );
+  if(itemToDeleteIndex > -1) {
+    newState.splice(itemToDeleteIndex,1);
+  }
+  return newState;
   case FETCH_COIN_PAIR_DETAIL_FULL_SUCCESS:
   let previosuCoinDetailIndex = _.findIndex(newState, e=> e.id == action.coinPairDetail.id );
   if(previosuCoinDetailIndex >=0){

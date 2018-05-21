@@ -45,7 +45,7 @@ export const SET_TOP_EXCHANGES_CURRENCIES = "SET_TOP_EXCHANGES_CURRENCIES";
 
 export const SET_TOP_TO_PAIR = "SET_TOP_TO_PAIR";
 export const FETCH_TOP_PAIRS_SUCCESS = "FETCH_TOP_PAIRS_SUCCESS";
-
+export const REMOVE_FAVORITE_COIN_PAIR = "REMOVE_FAVORITE_COIN_PAIR";
 export function fetchTopPairsSuccess(data) {
   return {
     type:FETCH_TOP_PAIRS_SUCCESS,
@@ -113,6 +113,13 @@ export function topExchangesCurrencyChange(obj){
 export function setPriceChartVisibilityFilter1W(){
   return {
     type:SET_PRICE_CHART_VISIBILITY_FILTER_1W
+  }
+}
+
+export function removeFavoriteCoinPair(id) {
+  return {
+    type:REMOVE_FAVORITE_COIN_PAIR,
+    id:id
   }
 }
 

@@ -4,14 +4,24 @@ import Divider from 'material-ui/Divider';
 import ReactDOM from 'react-dom';
 import Hammer from 'hammerjs';
 import _ from "underscore";
+import { connect } from 'react-redux';
+import {removeFavoriteCoinPair} from './actions';
 import Delete from 'material-ui/svg-icons/action/delete';
 
 const deleteIconStyles = {
   color:"white",
   height:"30",
   width:"30",
+  cursor:"pointer"
 };
-export default class FavoriteCoinPairItem extends Component {
+
+const mapDispatchToProps = dispatch => {
+  return {
+    removeItem:(id) => dispatch(removeFavoriteCoinPair(id))
+  };
+}
+
+class FavoriteCoinPairItem extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,6 +34,15 @@ export default class FavoriteCoinPairItem extends Component {
         distance: 0
       }
     }
+    this.closeItem = this.closeItem.bind(this);
+  }
+  closeItem(){
+    let newState = _.extend({},this.state);
+    newState.isOpen = false;
+    newState.pan.distance = 0;
+    newState.pan.enabled = false;
+    this.props.setChildPanning(false);
+    this.setState(newState);
   }
   componentDidMount(){
     if(!this.h){
@@ -86,7 +105,7 @@ export default class FavoriteCoinPairItem extends Component {
       <div style={{
         position:"relative"
       }}>
-      <ListItem key={this.props.pair.id} primaryText={this.props.pair.DISPLAY.PRICE} secondaryText={this.props.pair.RAW.FROMSYMBOL+" - "+ this.props.pair.RAW.TOSYMBOL + " "+ this.props.pair.RAW.MARKET}
+      <ListItem primaryText={this.props.pair.DISPLAY.PRICE} secondaryText={this.props.pair.RAW.FROMSYMBOL+" - "+ this.props.pair.RAW.TOSYMBOL + " "+ this.props.pair.RAW.MARKET}
         ref={(content) => { this.contentElement = ReactDOM.findDOMNode(content); }}
         style={{
           position:"relative",
@@ -112,9 +131,20 @@ export default class FavoriteCoinPairItem extends Component {
         display:"flex",
         justifyContent: "center",
         alignItems: "center"
-      }}><Delete style={deleteIconStyles}/></div>
+      }}>
+      <Delete style={deleteIconStyles}
+              onClick={() => {
+                this.props.removeItem(this.props.pair.id)
+              }}
+      /></div>
        <Divider />
      </div>
     );
   }
 }
+
+const CnctedFavoriteCoinPairItem = connect(
+  null,
+  mapDispatchToProps
+)(FavoriteCoinPairItem)
+export default CnctedFavoriteCoinPairItem;

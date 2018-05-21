@@ -1,7 +1,7 @@
 import { combineReducers, createStore } from 'redux';
 import {FETCH_COIN_PAIR_DETAIL_CHART,FETCH_COIN_PAIR_DETAIL_CHART_ERROR,
 FETCH_COIN_PAIR_DETAIL_CHART_SUCCESS,SET_PRICE_CHART_VISIBILITY_FILTER_1W,
-SET_PRICE_CHART_VISIBILITY_FILTER_1H} from '../actions';
+SET_PRICE_CHART_VISIBILITY_FILTER_1H,REMOVE_FAVORITE_COIN_PAIR} from '../actions';
 import {priceHistoryOneWeek,priceHistoryOneMonth,priceHistoryOneHour} from '../constants';
 import _ from "underscore";
 
@@ -13,6 +13,12 @@ let baseCoinPairPriceHistory = {
 function coinPairPriceHistory(state=baseCoinPairPriceHistory,action) {
   let newState = JSON.parse(JSON.stringify(state));
   switch (action.type) {
+    case REMOVE_FAVORITE_COIN_PAIR:
+      let itemToDeletIndex = _.findIndex(newState.histories, e => e.coinPairId == action.id );
+      if(itemToDeletIndex > -1){
+        newState.histories.splice(itemToDeletIndex,1);
+      }
+    return newState;
     case FETCH_COIN_PAIR_DETAIL_CHART_ERROR:
       newState.error = action.error;
       return newState;

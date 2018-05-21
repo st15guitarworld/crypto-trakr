@@ -200,7 +200,7 @@ class FavoriteCoinPairInner extends Component {
         }}
         >
         {this.props.favoriteCoinPairs.map((pair,index)=>(
-        <FavoriteCoinPairItem pair={pair} {...this.props} setChildPanning={this.setIsChildPanning} parentIsPanning={this.state.isPanning}/>
+        <FavoriteCoinPairItem key={pair.id} pair={pair} {...this.props} setChildPanning={this.setIsChildPanning} parentIsPanning={this.state.isPanning}/>
         ))}
       </List>
     </div>
