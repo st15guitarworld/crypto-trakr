@@ -8,9 +8,8 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware } from 'redux'
 import rootReducer from './reducers/reducers.js';
-import {fetchAllCoins,fetchAllExchanges} from './actions';
+import {fetchAllCoins,fetchAllExchanges,fetchNewsFeedAndCategories} from './actions';
 import {loadState,saveState} from './localStorage'
-
 const persistedState = loadState();
 const store = createStore(
   rootReducer,
@@ -42,3 +41,4 @@ registerServiceWorker();
 
 store.dispatch(fetchAllCoins())
 store.dispatch(fetchAllExchanges())
+store.dispatch(fetchNewsFeedAndCategories())

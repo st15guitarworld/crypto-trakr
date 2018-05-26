@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import {CoinCompareBaseUrl,CoinList,CryptoSortOrderAttribute,
-price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute, topExchanges,topPairsTotalVolume} from './constants';
+price,AllExchanges,priceMultiFull,priceHistoryOneWeek,priceHistoryOneHour,HisToHour,HistoMinute, topExchanges,topPairsTotalVolume,dataNewsFeedsAndCategories} from './constants';
 import uuidv1 from 'uuid/v1';
 import {buildURLParameters} from './buildURLParameters';
 export const FETCH_ALL_COINS = 'FETCH_ALL_COINS';
@@ -46,6 +46,22 @@ export const SET_TOP_EXCHANGES_CURRENCIES = "SET_TOP_EXCHANGES_CURRENCIES";
 export const SET_TOP_TO_PAIR = "SET_TOP_TO_PAIR";
 export const FETCH_TOP_PAIRS_SUCCESS = "FETCH_TOP_PAIRS_SUCCESS";
 export const REMOVE_FAVORITE_COIN_PAIR = "REMOVE_FAVORITE_COIN_PAIR";
+
+export const FETCH_NEWS_FEED_AND_CATEGORIES = "FETCH_NEWS_FEED_AND_CATEGORIES";
+export const FETCH_NEWS_FEED_AND_CATEGORIES_S = "FETCH_NEWS_FEED_AND_CATEGORIES_S";
+export const FETCH_NEWS_FEED_AND_CATEGORIES_E = "FETCH_NEWS_FEED_AND_CATEGORIES_E";
+
+
+export function fetchNewsFeedAndCategories(){
+  return dispatch => {
+    dispatch({type:FETCH_NEWS_FEED_AND_CATEGORIES});
+    return fetch(CoinCompareBaseUrl + dataNewsFeedsAndCategories)
+           .then(response => response.json())
+           .then(json => {
+             dispatch({type:FETCH_NEWS_FEED_AND_CATEGORIES_S,data:json.Data})
+           })
+  }
+}
 export function fetchTopPairsSuccess(data) {
   return {
     type:FETCH_TOP_PAIRS_SUCCESS,

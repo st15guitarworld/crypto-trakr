@@ -10,6 +10,7 @@ export const priceMultiFull = "/data/pricemultifull";
 export const price = "/data/price";
 export const topExchanges = "/data/top/exchanges/full";
 export const topPairsTotalVolume = "/data/top/totalvol"
+export const dataNewsFeedsAndCategories = "/data/news/feedsandcategories";
 export const priceHistoryOneWeek = "1W";
 export const priceHistoryOneHour = "1H";
 export const priceHistoryOneMonth = "1M";
