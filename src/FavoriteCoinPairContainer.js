@@ -168,6 +168,7 @@ class FavoriteCoinPairInner extends Component {
       height: document.body.scrollHeight - 120 + "px",
       overflow:"scroll"
     }}>
+
       <div
         style={{
           WebkitTransform:"translate3d( 0,"+(distance - ptrElOffsetHeight)+ "px,0)",

@@ -1,5 +1,15 @@
 import { combineReducers, createStore } from 'redux';
-import {FETCH_NEWS_FEED_AND_CATEGORIES,FETCH_NEWS_FEED_AND_CATEGORIES_S,FETCH_NEWS_FEED_AND_CATEGORIES_E} from '../actions'
+import {FETCH_NEWS_FEED_AND_CATEGORIES,FETCH_NEWS_FEED_AND_CATEGORIES_S,FETCH_NEWS_FEED_AND_CATEGORIES_E,
+FETCH_NEWS,FETCH_NEWS_SUCCESS,FETCH_NEWS_ERROR} from '../actions'
+
+function news(state=[],action){
+  switch (action.type) {
+    case FETCH_NEWS_SUCCESS:
+      return action.data;
+    default:
+      return state;
+  }
+}
 
 let base= {
   error:null,
@@ -18,7 +28,20 @@ switch (action.type) {
 }
 }
 
-function isFetching(state=false,action) {
+
+function isNewsFetching(state=false,action) {
+  switch (action.type) {
+    case FETCH_NEWS:
+      return true;
+    case FETCH_NEWS_SUCCESS:
+    case FETCH_NEWS_ERROR:
+      return false;
+    default:
+      return state;
+  }
+}
+
+function isNewsAndCategoriesFetching(state=false,action) {
   switch (action.type) {
     case FETCH_NEWS_FEED_AND_CATEGORIES:
       return true;
@@ -29,7 +52,16 @@ function isFetching(state=false,action) {
       return state;
   }
 }
-export default combineReducers({
+let newsandCategories = combineReducers({
   feedsAndCategories,
-  isFetching
+  isNewsAndCategoriesFetching
 });
+
+let theNews = combineReducers({
+  news,
+  isNewsFetching
+})
+export default combineReducers({
+  newsandCategories,
+  theNews
+})
